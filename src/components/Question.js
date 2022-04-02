@@ -1,18 +1,49 @@
 import React from 'react'
+import Answer from './Answer'
+import { nanoid } from 'nanoid'
 
 export default function Question(props) {
-    const [answers, setAnswers] = React.useState(mixAnwser())
+    const [answers, setAnswers] = React.useState([])
 
 
-    function mixAnwser() {
+    const answersElement = answers.map(answer => (
+        <Answer
+            testing={props.testing}
+            isCorrect={props.isCorrect}
+            checkCorrectAnswer={props.checkCorrectAnswer}
+            correct={fixQuestion(props.correct)}
+            handleClick={handleClick}
+            answer={fixQuestion(answer.answer)}
+            isChoose={answer.isChoose}
+            id={answer.id}
+            key={answer.id}
+        />
+    ))
+
+    function handleClick(id) {
+        setAnswers(prevAnswers => (
+            prevAnswers.map(answer => ({
+                ...answer,
+                isChoose: id === answer.id ? true : false
+            }))
+        ))
+    }
+
+    React.useState( () => {
         const answers = props.incorrects
         answers.push(props.correct)
         const random = Math.floor(Math.random() * 4)
         let temp = answers[random]
         answers[random] = props.correct
         answers[3] = temp
-        return answers
-    }
+        setAnswers(
+                answers.map(answer => ({
+                id: nanoid(),
+                answer: answer,
+                isChoose: false
+            }))
+        )
+    }, [])
 
     function fixQuestion(question) {
         let result = ""
@@ -33,10 +64,7 @@ export default function Question(props) {
                 {fixQuestion(props.question)}
             </h2>
             <ul className="choices">
-                <li>{fixQuestion(answers[0])}</li>
-                <li>{fixQuestion(answers[1])}</li>
-                <li>{fixQuestion(answers[2])}</li>
-                <li>{fixQuestion(answers[3])}</li>
+                {answersElement}
             </ul>
         </div>
     )
