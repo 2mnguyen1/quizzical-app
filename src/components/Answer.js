@@ -25,7 +25,7 @@ export default function Answer(props) {
 
 
     return (
-        <li onClick={() => {props.handleClick(props.id); props.checkCorrectAnswer(props.correct, props.answer);}}  style={styles} >
+        <li onClick={() => {props.handleClick(props.id)}} style={styles} >
             {props.answer}
         </li>
     )

@@ -3,17 +3,46 @@ import Answer from './Answer'
 import { nanoid } from 'nanoid'
 
 export default function Question(props) {
-    const [answers, setAnswers] = React.useState([])
+    const [answers, setAnswers] = React.useState(props.choices)
+    const [isCorrect, setIsCorrect] = React.useState(false)
+    const [testing, setTesting] = React.useState(false)
 
+    React.useState( () => {
+        setAnswers(
+                answers.map(answer => ({
+                id: nanoid(),
+                answer: answer,
+                isChoose: false
+            }))
+        )
+    }, [])
+
+
+    function checkCorrectAnswer() {
+        const updateCount = () => props.addCount()
+        setTesting(true)
+        let choosing
+        for (let answer of answers) {
+            if (answer.isChoose){
+                choosing = answer.answer
+            }
+        }
+
+        if (props.correct === choosing) {
+            setIsCorrect(true)
+            // updateCount()
+        } else {
+            setIsCorrect(false)
+        }
+    }
 
     const answersElement = answers.map(answer => (
         <Answer
-            testing={props.testing}
-            isCorrect={props.isCorrect}
-            checkCorrectAnswer={props.checkCorrectAnswer}
-            correct={fixQuestion(props.correct)}
+            testing={testing}
+            isCorrect={isCorrect}
+            correct={props.correct}
             handleClick={handleClick}
-            answer={fixQuestion(answer.answer)}
+            answer={answer.answer}
             isChoose={answer.isChoose}
             id={answer.id}
             key={answer.id}
@@ -29,30 +58,15 @@ export default function Question(props) {
         ))
     }
 
-    React.useState( () => {
-        const answers = props.incorrects
-        answers.push(props.correct)
-        const random = Math.floor(Math.random() * 4)
-        let temp = answers[random]
-        answers[random] = props.correct
-        answers[3] = temp
-        setAnswers(
-                answers.map(answer => ({
-                id: nanoid(),
-                answer: answer,
-                isChoose: false
-            }))
-        )
-    }, [])
 
-    function fixQuestion(question) {
+    function fixQuestion(str) {
         let result = ""
-        for (let i = 0; i < question.length; i++) {
-            if (question[i] === ';') {continue;}
-            if (question[i] === '&') {
+        for (let i = 0; i < str.length; i++) {
+            if (str[i] === ';') {continue;}
+            if (str[i] === '&') {
                 i += 5
             } else {
-                result += question[i]
+                result += str[i]
             }
         }
         return result
@@ -65,6 +79,7 @@ export default function Question(props) {
             </h2>
             <ul className="choices">
                 {answersElement}
+                <button onClick={checkCorrectAnswer}></button>
             </ul>
         </div>
     )
